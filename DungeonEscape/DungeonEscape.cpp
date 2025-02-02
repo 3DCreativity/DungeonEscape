@@ -2,6 +2,15 @@
 #include <fstream>
 using namespace std;
 
+#pragma region struct Definitions
+
+struct User {
+	bool new_user = true;
+	char ID[200] = "Undefined\0";
+	unsigned long long coins = 0;
+	unsigned long long last_unlocked_level = 0;
+};
+
 struct Point {
 	size_t x;
 	size_t y;
@@ -14,7 +23,13 @@ struct Player {
 	bool key = false;
 };
 
-char pause_screen[8][30] = {
+#pragma endregion 
+
+#pragma region Menus set-up
+
+const size_t pause_screen_width = 30; //For Debugging Purposes
+const size_t pause_screen_height = 8; //For Debugging Purposes
+char pause_screen[pause_screen_height][pause_screen_width] = {
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'P', 'a', 'u', 's', 'e', ' ', 'm', 'e', 'n', 'u', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '1', ']', ' ', 'R', 'e', 's', 'u', 'm', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
@@ -24,14 +39,124 @@ char pause_screen[8][30] = {
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'}
 };
+
+const size_t main_menu_screen_width = 30; //For Debugging Purposes
+const size_t main_menu_screen_height = 10; //For Debugging Purposes
+char main_menu_screen[main_menu_screen_height][main_menu_screen_width] = {
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'D', 'u', 'n', 'g', 'e', 'o', 'n', ' ', 'e', 's', 'c', 'a', 'p', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '1', ']', ' ', 'N', 'e', 'w', ' ', 'g', 'a', 'm', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '2', ']', ' ', 'C', 'o', 'n', 't', 'i', 'n', 'u', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '3', ']', ' ', 'L', 'e', 'v', 'e', 'l', ' ', 's', 'e', 'l', 'e', 'c', 't', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '4', ']', ' ', 'L', 'e', 'a', 'd', 'e', 'r', 'b', 'o', 'a', 'r', 'd', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '5', ']', ' ', 'D', 'e', 'l', 'e', 't', 'e', ' ', 'u', 's', 'e', 'r', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '6', ']', ' ', 'E', 'x', 'i', 't', ' ', 'g', 'a', 'm', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'}
+};
+
+const size_t level_select_screen_width = 30; //For Debugging Purposes
+const size_t level_select_screen_height = 6; //For Debugging Purposes
+char level_select_screen[level_select_screen_height][level_select_screen_width] = {
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'L', 'e', 'v', 'e', 'l', ' ', 's', 'e', 'l', 'e', 'c', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'A', 'v', 'a', 'i', 'l', 'a', 'b', 'l', 'e', ' ', 'L', 'e', 'v', 'e', 'l', 's', ':', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'I', 'D', ' ', ' ', ' ', 'N', 'a', 'm', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'}
+};
+
+#pragma endregion
+
+//Reminder: 9 white spaces {ID} (5 - ID length) spaces {Name}
+
+#pragma region Variables
+
 char** map;
+char map_name[100];
 size_t map_width;
 size_t map_height;
+
 Point* portal_data;
 size_t portal_data_size;
+
 size_t display_width;
 size_t display_height;
+
 Player player;
+
+User user;
+
+#pragma endregion
+
+#pragma region rewriteCharArray function (4 ovedrloads)
+
+void rewriteCharArray(char* arr, const char line[])
+{
+	size_t index = 0;
+	for (; line[index] != '\0'; index++)
+	{
+		arr[index] = line[index];
+	}
+	arr[index] = '\0';
+}
+
+void rewriteCharArray(char* arr, char line[])
+{
+	size_t index = 0;
+	for (; line[index] != '\0'; index++)
+	{
+		arr[index] = line[index];
+	}
+	arr[index] = '\0';
+}
+
+void rewriteCharArray(char* arr, const char line[], size_t max_size)
+{
+	size_t index = 0;
+	for (; line[index] != '\0'; index++)
+	{
+		if (index == max_size - 2)
+		{
+			break;
+		}
+		arr[index] = line[index];
+	}
+	arr[index] = '\0';
+}
+
+void rewriteCharArray(char* arr, char line[], size_t max_size)
+{
+	size_t index = 0;
+	for (; line[index] != '\0'; index++)
+	{
+		if (index == max_size - 2)
+		{
+			break;
+		}
+		arr[index] = line[index];
+	}
+	arr[index] = '\0';
+}
+
+#pragma endregion
+
+void displayMainMenu()
+{
+	cout << main_menu_screen[0] << endl << main_menu_screen[1] << endl;
+	if (user.new_user)
+	{
+		cout << "        Welcome, " << user.ID << "!" << endl;
+	}
+	else
+	{
+		cout << "    Welcome back, " << user.ID << "!" << endl;
+	}
+	for (size_t i = 2; i < main_menu_screen_height; i++)
+	{
+		cout << main_menu_screen[i] << endl;
+	}
+}
 
 void displayMap()
 {
@@ -41,15 +166,25 @@ void displayMap()
 	}
 }
 
+void displayPauseMenu() {
+	for (size_t i = 0; i < pause_screen_height; i++)
+	{
+		cout << pause_screen[i] << endl;
+	}
+}
+
 void switchMapElements(Point cell1, Point cell2, bool clearCell2)
 {
 	if (clearCell2) {
 		map[cell2.y][cell2.x] = ' ';
 	}
-	char temp = map[cell1.y][cell1.x];
-	map[cell1.y][cell1.x] = map[cell2.y][cell2.x];
-	map[cell2.y][cell2.x] = temp;
+
+	map[cell1.y][cell1.x] += map[cell2.y][cell2.x];
+	map[cell2.y][cell2.x] = map[cell1.y][cell1.x] - map[cell2.y][cell2.x];
+	map[cell1.y][cell1.x] = map[cell1.y][cell1.x] - map[cell2.y][cell2.x];
 }
+
+void teleportPlayer(Point& teleporter_location);
 
 void changePlayerPosition(long long x, long long y)
 {
@@ -89,9 +224,13 @@ void changePlayerPosition(long long x, long long y)
 
 			break;
 		case '%':
-			//Call a function that reads the map data using the position of the portal and calling this function again to change the player position
+
+			//Read portal data and change the player location accordingly
+			teleportPlayer(new_position);
+
 			break;
 		case '&':
+
 			//Update key status
 			player.key = true;
 
@@ -102,13 +241,16 @@ void changePlayerPosition(long long x, long long y)
 			player.position = new_position;
 
 			break;
+
 		case 'X':
+
 			if (player.key) {
 				//End the sub-level
 			}
 			else {
 				//Display message that you don't have the key
 			}
+
 			break;
 		default:
 			switchMapElements(player.position, new_position, false);
@@ -117,62 +259,117 @@ void changePlayerPosition(long long x, long long y)
 	}
 }
 
-void pauseMenu()
+void teleportPlayer(Point& teleporter_location)
 {
-	char pause_input;
-	char pause_message[100] = "\0";
-	while (true)
+	size_t index = 0;
+	for (; index < portal_data_size*2; index += 2)
 	{
-		displayPauseMenu();
-		cout << endl << endl << pause_message << endl;
-		cout << "\nEnter your option: ";
-		cin >> pause_input;
-		switch (pause_input)
+		if ((portal_data[index].x == teleporter_location.x) && (portal_data[index].y == teleporter_location.y))
 		{
-		case '1':
+			changePlayerPosition(portal_data[index + 1].x - player.position.x, portal_data[index + 1].y - player.position.y);
 			return;
-			break;
-		case '2':
-			//Save progress
-			break;
-		case '3':
-
 		}
 	}
+	//Do something that lets the developer know that something went wrong
+}
+
+//Returns
+//0 - Resume
+//1 - Exit to Main Menu
+//2 - Exit Game
+int pauseMenu()
+{
+	char pause_input;
+	const size_t max_message_index = 200;
+	char pause_message[max_message_index] = "\0";
+	char input;
+	int return_status = 0;
+	do
+	{
+		system("cls");
+		displayPauseMenu();
+		cout << endl << pause_message << endl << endl;
+		cout << "Enter input: ";
+		cin >> input;
+		switch (input)
+		{
+			case '1':
+				return_status = 0;
+				break;
+			case '2':
+				//Run save function - saveProgress(pause_message);
+				rewriteCharArray(pause_message, "Save functionality is still under construction\0", max_message_index);
+				break;
+			case '3':
+				//Display warning
+				return_status = 1;
+				input = '1';
+				break;
+			case '4':
+				//Display warning
+				return_status = 2;
+				input = '1';
+				break;
+			default:
+				//Change message
+				rewriteCharArray(pause_message, "Invalid input. Try again: \0", max_message_index);
+				break;
+
+		}
+	} while (input != '1');
+	return return_status;
 }
 
 //Returns
 //0 - Everything went fine
 //1 - Something went wrong
 //2 - Invalid input
-//3 - End Game
+//3 - Main Menu
+//4 - End Game
+//5 - Exit Game
 int step(char input)
 {
 	switch (input)
 	{
-	case 'w':
-	case 'W':
-		changePlayerPosition(0, -1);
-		break;
-	case 's':
-	case 'S':
-		changePlayerPosition(0, 1);
-		break;
-	case 'a':
-	case 'A':
-		changePlayerPosition(-1, 0);
-		break;
-	case 'd':
-	case 'D':
-		changePlayerPosition(1, 0);
-		break;
-	case 'p':
-	case 'P':
-		pauseMenu();
-		break;
-	default:
-		return 2;
-		//break;
+		case 'w':
+		case 'W':
+			changePlayerPosition(0, -1);
+			break;
+		case 's':
+		case 'S':
+			changePlayerPosition(0, 1);
+			break;
+		case 'a':
+		case 'A':
+			changePlayerPosition(-1, 0);
+			break;
+		case 'd':
+		case 'D':
+			changePlayerPosition(1, 0);
+			break;
+		case 'p':
+		case 'P':
+			switch (pauseMenu())
+			{
+			case 0:
+				//Do nothing
+				break;
+			case 1:
+				//Pass Main Menu signal
+				return 3;
+				break;
+			case 2:
+				//Pass Exit Game signal
+				return 5;
+				break;
+			default:
+				return 1;
+				break;
+			}
+			break;
+		default:
+			return 2;
+			break;
 	}
 	//Make a step for enemies
 	return 0; //Temporary
@@ -260,7 +457,6 @@ int extractMap(ifstream& file)
 	}
 	for (size_t i = 0; i < map_height; i++) {
 		file.getline(map[i], map_width+1);
-		cout << map[i];
 		if (file.eof())
 		{
 			if (i < map_height - 1)
@@ -323,9 +519,13 @@ int extractPortalData(ifstream& file)
 		file.getline(line, map_width * 4 + 3);
 		for (size_t j = 0; j < map_width * 4 + 3; j++)
 		{
-			if (line[j] == '\0' && (!calculating_y || !point_1_finished))
+			if (line[j] == '\0')
 			{
-				return 1;
+				if ((!calculating_y || !point_1_finished))
+				{
+					return 1;
+				}
+				break;
 			}
 			if (line[j] == 'x' || line[j] == 'X')
 			{
@@ -336,6 +536,7 @@ int extractPortalData(ifstream& file)
 			{
 				calculating_y = false;
 				point_1_finished = true;
+				continue;
 			}
 			if (point_1_finished)
 			{
@@ -343,6 +544,7 @@ int extractPortalData(ifstream& file)
 				{
 					portal_destination.y *= 10;
 					portal_destination.y += line[j] - '0';
+					continue;
 				}
 				portal_destination.x *= 10;
 				portal_destination.x += line[j] - '0';
@@ -353,6 +555,7 @@ int extractPortalData(ifstream& file)
 				{
 					portal_location.y *= 10;
 					portal_location.y += line[j] - '0';
+					continue;
 				}
 				portal_location.x *= 10;
 				portal_location.x += line[j] - '0';
@@ -424,18 +627,60 @@ int readMapData(char file_path[])
 	return 0;
 }
 
-int main()
+void extractLevelName(char* name, char* path, size_t max_name_size)
 {
-	char file[] = "./Files/Maps/test_map.txt";
-	if (readMapData(file) == 1)
+	size_t index_path = 0;
+	size_t index_name = 0;
+	while (path[index_path] != '\0' && (path[index_path] != '.' || index_path==0))
 	{
-		cout << "Something went wrong while trying to open the Map Data file";
-		return 0;
+		if (path[index_path] == '/' || path[index_path] == '\\')
+		{
+			index_path++;
+			index_name = 0;
+			continue;
+		}
+		if (index_name == max_name_size - 2)
+		{
+			index_path++;
+			continue;
+		}
+		name[index_name] = path[index_path];
+		index_name++;
+		index_path++;
 	}
-	char input;
+	name[index_name] = '\0';
+}
 
-	while (true) {
+//Returns
+//0 - End of level
+//1 - Return to Main Menu
+//2 - Close the game entirely
+int levelCycle(char filepath[])
+{
+	//Try to read map
+	if (readMapData(filepath) == 1)
+	{
+		//TODO: Change to a screen message
+		cout << "Something went wrong while trying to open the Map Data file";
+		return 1;
+	}
+
+	//Define level name
+	size_t level_name_max_size = 100;
+	char* level_name = new char[level_name_max_size];
+	extractLevelName(level_name,filepath, level_name_max_size);
+	char input ;
+	const size_t max_message_index = 200;
+	char message[max_message_index] = "\0";
+	while (true)
+	{
+		//Display level, player and map data
+		cout << "Level: " << level_name << endl;
+		//displayPlayerInfo();
 		displayMap();
+
+		//Print message
+		cout << "\n" << message;
 		cout << "\n\n\nEnter your input: ";
 		cin >> input;
 		switch (step(input))
@@ -444,15 +689,82 @@ int main()
 				cout << "Something major has gone wrong";
 				break;
 			case 2:
-				return 0;
+				rewriteCharArray(message, "Invalid input. Try again: \0", max_message_index);
 				break;
 			case 3:
 				freeMapData();
-				//Go to menu cycle
+				freePortalData();
+				delete(level_name);
+				return 1;
+				break;
+			case 4:
+				freeMapData();
+				freePortalData();
+				delete(level_name);
+				return 0;
+				break;
+			case 5:
+				freeMapData();
+				freePortalData();
+				delete(level_name);
+				return 2;
+				break;
 			default:
 				break;
 		}
 		system("cls");
+	}
+}
+
+
+
+void mainMenuCycle(char* filepath)
+{
+
+}
+
+int main()
+{
+	char* file = new char[200];
+	rewriteCharArray(file, "./Files/Maps/test_map.txt\0");
+	//cout << file;
+	bool ignore_main_menu = false;
+	while (true)
+	{
+		/*if (!ignore_main_menu)
+		{
+			switch (mainMenuCycle(file))
+			{
+
+			}
+		}*/
+		switch (levelCycle(file))
+		{
+		case 0:
+			system("cls");
+			cout << "Sub level finished";
+			cin;
+			cin.ignore();
+			//Change the filepath and load the next sub-level
+			return 0;
+			break;
+		case 1:
+			system("cls");
+			cout << "Exited to main menu";
+			cin;
+			cin.ignore();
+			return 0;
+			//Load the main menu
+			break;
+		case 2:
+			system("cls");
+			cout << "Exited Game";
+			cin;
+			cin.ignore();
+			return 0;
+			//Exit the game
+			break;
+		}
 	}
 	return 0;
 }
