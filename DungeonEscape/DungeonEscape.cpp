@@ -6,7 +6,7 @@ using namespace std;
 
 struct User {
 	bool new_user = true;
-	char ID[200] = "Undefined\0";
+	char ID[51] = "Undefined\0";
 	size_t coins = 0;
 	size_t last_unlocked_level = 0;
 	bool save_file_created = false;
@@ -51,8 +51,8 @@ char main_menu_screen[main_menu_screen_height][main_menu_screen_width] = {
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '1', ']', ' ', 'N', 'e', 'w', ' ', 'g', 'a', 'm', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '2', ']', ' ', 'C', 'o', 'n', 't', 'i', 'n', 'u', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '3', ']', ' ', 'L', 'e', 'v', 'e', 'l', ' ', 's', 'e', 'l', 'e', 'c', 't', ' ', ' ', ' ', ' ', '\0'},
-			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '4', ']', ' ', 'L', 'e', 'a', 'd', 'e', 'r', 'b', 'o', 'a', 'r', 'd', ' ', ' ', ' ', ' ', ' ', '\0'},
-			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '5', ']', ' ', 'D', 'e', 'l', 'e', 't', 'e', ' ', 'u', 's', 'e', 'r', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '4', ']', ' ', 'D', 'e', 'l', 'e', 't', 'e', ' ', 'u', 's', 'e', 'r', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '5', ']', ' ', 'L', 'o', 'g', ' ', 'o', 'u', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '[', '6', ']', ' ', 'E', 'x', 'i', 't', ' ', 'g', 'a', 'm', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'}
 };
@@ -149,11 +149,166 @@ void rewriteCharArray(char* arr, char line[], size_t max_size)
 
 #pragma endregion
 
+#pragma region stringContains function (3 overloads)
+
+bool stringContains(char* arr, char a)
+{
+	size_t index = 0;
+	while (arr[index] != '\0')
+	{
+		if (arr[index] == a)
+		{
+			return true;
+		}
+		index++;
+	}
+	return false;
+}
+
+bool stringContains(char* arr, char a[])
+{
+	size_t index = 0;
+	while (a[index] != '\0')
+	{
+		if (!stringContains(arr, a[index]))
+		{
+			return false;
+		}
+		index++;
+	}
+	return true;
+}
+
+bool stringContains(char* arr, const char a[])
+{
+	size_t index = 0;
+	while (a[index] != '\0')
+	{
+		if (!stringContains(arr, a[index]))
+		{
+			return false;
+		}
+		index++;
+	}
+	return true;
+}
+
+#pragma endregion
+
+#pragma region stringEquals function (2 overloads)
+
+bool stringEquals(char* arr, const char string[])
+{
+	size_t index = 0;
+	while (arr[index] != '\0')
+	{
+		if (arr[index] != string[index])
+		{
+			return false;
+		}
+		index++;
+	}
+	if (string[index] != '\0')
+	{
+		return false;
+	}
+	return true;
+}
+
+bool stringEquals(char* arr, char string[])
+{
+	size_t index = 0;
+	while (arr[index] != '\0')
+	{
+		if (arr[index] != string[index])
+		{
+			return false;
+		}
+		index++;
+	}
+	if (string[index] != '\0')
+	{
+		return false;
+	}
+	return true;
+}
+
+#pragma endregion
+
+long long fromString(char* arr)
+{
+	size_t index = 0;
+	long long result = 0;
+	while (arr[index] >= '0' && arr[index] <= '9' && arr[index] != '\0')
+	{
+		result *= 10;
+		result += arr[index] - '0';
+		index++;
+	}
+	return result;
+}
+
 void waitUserInput()
 {
 	char temp;
 	cin >> temp;
 	cin.ignore();
+}
+
+#pragma region Display functions
+
+void displayMessage(const char* arr)
+{
+	system("cls");
+	cout << arr << endl;
+	waitUserInput();
+}
+
+//Returns
+//1
+//2
+int displayPrompt(const char* arr)
+{
+	const size_t max_index = 200;
+	char message[max_index] = "\0";
+	char input;
+	while (true)
+	{
+		system("cls");
+		cout << arr << endl << endl << message << endl << "Enter input: ";
+		cin >> input;
+		switch (input)
+		{
+		case '1':
+			return 1;
+			break;
+		case '2':
+			return 2;
+			break;
+		default:
+			rewriteCharArray(message, "Invalid input. Try again: \n Hint: 1 or 2\n\0", max_index);
+			break;
+		}
+	}
+}
+
+void displayPlayerStats()
+{
+	cout << "Lives: ";
+	for (size_t i = 0; i < player.lives; i++)
+	{
+		cout << "<3 ";
+	}
+	cout << endl << "Coins: " << player.coins << endl << "Key: ";
+	if (player.key)
+	{
+		cout << "Found";
+	}
+	else
+	{
+		cout << "Not found";
+	}
+	cout << endl;
 }
 
 void displayMainMenu()
@@ -196,7 +351,7 @@ void displayLeaderboard()
 
 	if (!leaderboard.is_open())
 	{
-		cout << "Error while trying to load leaderboard.";
+		cout << "Error while trying to load leaderboard.\n\n";
 		cout << endl << "Enter any input to go back to the Main Menu\n";
 		waitUserInput();
 		return;
@@ -216,6 +371,159 @@ void displayLeaderboard()
 
 }
 
+#pragma endregion
+
+#pragma region User functions
+
+void deleteUser()
+{
+
+	ifstream reader("./Files/users.txt");
+	size_t current_row_count = 0;
+	while (!reader.eof())
+	{
+		reader.ignore(51,'\n');
+		current_row_count++;
+	}
+	reader.close();
+	reader.open("./Files/users.txt",ios::in);
+	char** lines = new char* [current_row_count];
+	size_t index = 0;
+	while (!reader.eof())
+	{
+		lines[index] = new char[51];
+		reader.getline(lines[index], 51);
+		if (stringEquals(lines[index], user.ID))
+		{
+			reader.ignore(51, '\n');
+			reader.ignore(51, '\n');
+			reader.ignore(51, '\n');
+			reader.ignore(51, '\n');
+			current_row_count -= 5;
+			delete(lines[index]);
+			continue;
+		}
+		index++;
+	}
+	reader.close();
+	index = 0;
+	fstream users;
+	users.open("./Files/users.txt", ios::out);
+	/*if (!users)
+	{
+		return 1;
+	}*/
+	for (; index < current_row_count; index++)
+	{
+		users << (index == 0 ? "" : "\n") << lines[index];
+	}
+	users.close();
+}
+
+void logOffUser()
+{
+	user.ID[0] = '\0';
+	user.coins = 0;
+	user.last_unlocked_level = 0;
+	user.new_user = true;
+	user.save_file_created = false;
+	user.save_file_used = false;
+}
+
+//Returns
+//0 - Everything is OK
+//1 - something went wrong
+int appendUser(char* ID,size_t current_row_count)
+{
+
+	ifstream reader("./Files/users.txt");
+	char** lines = new char*[current_row_count];
+	size_t index = 0;
+	while (!reader.eof())
+	{
+		lines[index] = new char[51];
+		reader.getline(lines[index], 51);
+		index++;
+	}
+	reader.close();
+	index = 0;
+	fstream users;
+	users.open("./Files/users.txt", ios::out);
+	if (!users)
+	{
+		return 1;
+	}
+	for (; index < current_row_count; index++)
+	{
+		users << (index == 0 ? "" : "\n") << lines[index];
+	}
+	users << endl << ID << endl << '0' << endl << '0' << endl << "false" << endl << "false";
+	users.close();
+	logOffUser();
+	index = 0;
+	while (ID[index] != '\0')
+	{
+		user.ID[index] = ID[index];
+		index++;
+	}
+	user.ID[index] = '\0';
+	return 0;
+}
+
+//Returns
+//0 - Everything is OK
+//1 - something went wrong
+int logInUser(char* ID)
+{
+	ifstream users("./Files/users.txt");
+	if (!users.is_open())
+	{
+		return 1;
+	}
+
+	size_t line_size = 51;
+	char line[51];
+	bool user_found = false;
+	size_t row_count = 0;
+	while (!users.eof())
+	{
+		users.getline(line, line_size);
+		row_count++;
+		if (stringEquals(line, ID))
+		{
+			users.getline(line, line_size);
+			user.coins = fromString(line);
+			users.getline(line, line_size);
+			user.last_unlocked_level = line[0] - '0';
+			users.getline(line, line_size);
+			user.save_file_created = stringEquals(line, "true\0");
+			users.getline(line, line_size);
+			user.save_file_used = stringEquals(line, "true\0");
+			user.new_user = false;
+			size_t index = 0;
+			while (ID[index] != '\0')
+			{
+				user.ID[index] = ID[index];
+				index++;
+			}
+			user.ID[index] = '\0';
+			user_found = true;
+			break;
+		}
+	}
+	users.close();
+	if (!user_found)
+	{
+		if (appendUser(ID, row_count) != 0)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+#pragma endregion
+
 void switchMapElements(Point cell1, Point cell2, bool clearCell2)
 {
 	if (clearCell2) {
@@ -229,7 +537,10 @@ void switchMapElements(Point cell1, Point cell2, bool clearCell2)
 
 void teleportPlayer(Point& teleporter_location);
 
-void changePlayerPosition(long long x, long long y)
+//Returns
+//0 - Everything is alright
+//1 - End level
+int changePlayerPosition(long long x, long long y)
 {
 	if (player.position.x + x < 0)
 	{
@@ -289,9 +600,11 @@ void changePlayerPosition(long long x, long long y)
 
 			if (player.key) {
 				//End the sub-level
+				return 1;
 			}
 			else {
 				//Display message that you don't have the key
+				displayMessage("Treasure chest is locked. Find the key.\nHint: &\n\0");
 			}
 
 			break;
@@ -300,6 +613,7 @@ void changePlayerPosition(long long x, long long y)
 			player.position = new_position;
 			break;
 	}
+	return 0;
 }
 
 void teleportPlayer(Point& teleporter_location)
@@ -314,108 +628,6 @@ void teleportPlayer(Point& teleporter_location)
 		}
 	}
 	//Do something that lets the developer know that something went wrong
-}
-
-//Returns
-//0 - Resume
-//1 - Exit to Main Menu
-//2 - Exit Game
-int pauseMenu()
-{
-	char pause_input;
-	const size_t max_message_index = 200;
-	char pause_message[max_message_index] = "\0";
-	char input;
-	int return_status = 0;
-	do
-	{
-		system("cls");
-		displayPauseMenu();
-		cout << endl << pause_message << endl << endl;
-		cout << "Enter input: ";
-		cin >> input;
-		switch (input)
-		{
-			case '1':
-				return_status = 0;
-				break;
-			case '2':
-				//Run save function - saveProgress(pause_message);
-				rewriteCharArray(pause_message, "Save functionality is still under construction\0", max_message_index);
-				break;
-			case '3':
-				//Display warning
-				return_status = 1;
-				input = '1';
-				break;
-			case '4':
-				//Display warning
-				return_status = 2;
-				input = '1';
-				break;
-			default:
-				//Change message
-				rewriteCharArray(pause_message, "Invalid input. Try again: \0", max_message_index);
-				break;
-
-		}
-	} while (input != '1');
-	return return_status;
-}
-
-//Returns
-//0 - Everything went fine
-//1 - Something went wrong
-//2 - Invalid input
-//3 - Main Menu
-//4 - End Game
-//5 - Exit Game
-int step(char input)
-{
-	switch (input)
-	{
-		case 'w':
-		case 'W':
-			changePlayerPosition(0, -1);
-			break;
-		case 's':
-		case 'S':
-			changePlayerPosition(0, 1);
-			break;
-		case 'a':
-		case 'A':
-			changePlayerPosition(-1, 0);
-			break;
-		case 'd':
-		case 'D':
-			changePlayerPosition(1, 0);
-			break;
-		case 'p':
-		case 'P':
-			switch (pauseMenu())
-			{
-			case 0:
-				//Do nothing
-				break;
-			case 1:
-				//Pass Main Menu signal
-				return 3;
-				break;
-			case 2:
-				//Pass Exit Game signal
-				return 5;
-				break;
-			default:
-				return 1;
-				break;
-			}
-			break;
-		default:
-			return 2;
-			break;
-	}
-	//Make a step for enemies
-	return 0; //Temporary
 }
 
 //Returns
@@ -441,13 +653,30 @@ int findPlayer()
 	return 1;
 }
 
+void freeMapData()
+{
+	for (size_t i = 0; i < map_height; i++)
+	{
+		delete(map[i]);
+	}
+	delete(map);
+	map_width = 0;
+	map_height = 0;
+}
+
+void freePortalData()
+{
+	delete(portal_data);
+	portal_data_size = 0;
+}
+
 //Returns
 //0 - Verification successful
 //1 - Verification failed
 int verifyValidMapDimentions(char line[], size_t line_size)
 {
 	bool reading_height_data = false;
-	for (size_t i=0;i<line_size;i++)
+	for (size_t i = 0; i < line_size; i++)
 	{
 		if (line[i] == '\0')
 		{
@@ -496,10 +725,10 @@ int extractMap(ifstream& file)
 	map = new char* [map_height];
 	for (size_t i = 0; i < map_height; i++)
 	{
-		map[i] = new char[map_width+1];
+		map[i] = new char[map_width + 1];
 	}
 	for (size_t i = 0; i < map_height; i++) {
-		file.getline(map[i], map_width+1);
+		file.getline(map[i], map_width + 1);
 		if (file.eof())
 		{
 			if (i < map_height - 1)
@@ -553,7 +782,7 @@ int extractPortalData(ifstream& file)
 	bool calculating_y = false;
 	bool point_1_finished = false;
 	char* line = new char[map_width * 4 + 3];
-	for (size_t i = 0; i < portal_data_size*2; i+=2)
+	for (size_t i = 0; i < portal_data_size * 2; i += 2)
 	{
 		calculating_y = false;
 		point_1_finished = false;
@@ -609,24 +838,6 @@ int extractPortalData(ifstream& file)
 	}
 	return 0;
 }
-
-void freeMapData()
-{
-	for (size_t i = 0; i < map_height; i++)
-	{
-		delete(map[i]);
-	}
-	delete(map);
-	map_width = 0;
-	map_height = 0;
-}
-
-void freePortalData()
-{
-	delete(portal_data);
-	portal_data_size = 0;
-}
-
 //Returns
 //0 - Reading Map Data was successful
 //1 - Reading Map Data has failed
@@ -674,7 +885,7 @@ void extractLevelName(char* name, char* path, size_t max_name_size)
 {
 	size_t index_path = 0;
 	size_t index_name = 0;
-	while (path[index_path] != '\0' && (path[index_path] != '.' || index_path==0))
+	while (path[index_path] != '\0' && (path[index_path] != '.' || index_path == 0))
 	{
 		if (path[index_path] == '/' || path[index_path] == '\\')
 		{
@@ -694,10 +905,129 @@ void extractLevelName(char* name, char* path, size_t max_name_size)
 	name[index_name] = '\0';
 }
 
+#pragma region Menus, and cycles - pauseMenu, step, levelCycle, mainMenuCycle, loginCycle
+
+//Returns
+//0 - Resume
+//1 - Exit to Main Menu
+//2 - Exit Game
+int pauseMenu()
+{
+	char pause_input;
+	const size_t max_message_index = 200;
+	char pause_message[max_message_index] = "\0";
+	char input;
+	int return_status = 0;
+	do
+	{
+		system("cls");
+		displayPauseMenu();
+		cout << endl << pause_message << endl << endl;
+		cout << "Enter input: ";
+		cin >> input;
+		switch (input)
+		{
+		case '1':
+			return_status = 0;
+			break;
+		case '2':
+			//Run save function - saveProgress(pause_message);
+			rewriteCharArray(pause_message, "Save functionality is still under construction\0", max_message_index);
+			break;
+		case '3':
+			if (displayPrompt("Warning!\nExiting to the Main Menu may cause your progress to be lost!\nMake sure you have saved your progress before continuing.\n\n[1] To Main Menu\t\t[2] Go back\n\0") == 1) {
+				return_status = 1;
+				input = '1';
+			}
+			break;
+		case '4':
+			if (displayPrompt("Warning!\nExiting the game may cause your progress to be lost!\nMake sure you have saved your progress before continuing.\n\n[1] Exit\t\t[2] Go back\n\0") == 1) {
+				return_status = 2;
+				input = '1';
+			}
+			break;
+		default:
+			//Change message
+			rewriteCharArray(pause_message, "Invalid input. Try again: \0", max_message_index);
+			break;
+
+		}
+	} while (input != '1');
+	return return_status;
+}
+
+//Returns
+//0 - Everything went fine
+//1 - Something went wrong
+//2 - Invalid input
+//3 - Main Menu
+//4 - End Game
+//5 - Exit Game
+int step(char input)
+{
+	switch (input)
+	{
+	case 'w':
+	case 'W':
+		if (changePlayerPosition(0, -1) == 1)
+		{
+			return 4;
+		}
+		break;
+	case 's':
+	case 'S':
+		if (changePlayerPosition(0, 1) == 1)
+		{
+			return 4;
+		}
+		break;
+	case 'a':
+	case 'A':
+		if (changePlayerPosition(-1, 0) == 1)
+		{
+			return 4;
+		}
+		break;
+	case 'd':
+	case 'D':
+		if (changePlayerPosition(1, 0) == 1)
+		{
+			return 4;
+		}
+		break;
+	case 'p':
+	case 'P':
+		switch (pauseMenu())
+		{
+		case 0:
+			//Do nothing
+			break;
+		case 1:
+			//Pass Main Menu signal
+			return 3;
+			break;
+		case 2:
+			//Pass Exit Game signal
+			return 5;
+			break;
+		default:
+			return 1;
+			break;
+		}
+		break;
+	default:
+		return 2;
+		break;
+	}
+	//Make a step for enemies
+	return 0; //Temporary
+}
+
 //Returns
 //0 - End of level
 //1 - Return to Main Menu
 //2 - Close the game entirely
+//3 - Restart level
 int levelCycle(char filepath[])
 {
 	//Try to read map
@@ -719,7 +1049,7 @@ int levelCycle(char filepath[])
 	{
 		//Display level, player and map data
 		cout << "Level: " << level_name << endl;
-		//displayPlayerInfo();
+		displayPlayerStats();
 		displayMap();
 
 		//Print message
@@ -737,6 +1067,9 @@ int levelCycle(char filepath[])
 			case 3:
 				freeMapData();
 				freePortalData();
+				player.lives = 3;
+				player.coins = 0;
+				player.key = false;
 				delete(level_name);
 				return 1;
 				break;
@@ -744,6 +1077,11 @@ int levelCycle(char filepath[])
 				freeMapData();
 				freePortalData();
 				delete(level_name);
+				user.coins += player.coins;
+				player.lives = 3;
+				player.coins = 0;
+				player.key = false;
+				//Update leaderboard
 				return 0;
 				break;
 			case 5:
@@ -754,6 +1092,29 @@ int levelCycle(char filepath[])
 				break;
 			default:
 				break;
+		}
+		if (player.lives == 0)
+		{
+			if (displayPrompt("You have died!\n\n[1] Restart the level\t\t[2] To Main Menu") == 1)
+			{
+				freeMapData();
+				freePortalData();
+				delete(level_name);
+				player.lives = 3;
+				player.coins = 0;
+				player.key = false;
+				return 3;
+			}
+			else
+			{
+				freeMapData();
+				freePortalData();
+				player.lives = 3;
+				player.coins = 0;
+				player.key = false;
+				delete(level_name);
+				return 1;
+			}
 		}
 		system("cls");
 	}
@@ -789,7 +1150,7 @@ int mainMenuCycle(char* filepath)
 			//Continue;
 			if (user.save_file_used)
 			{
-				//if(loadSaveFile(filepath) == 0)
+				//if(setSaveFile(filepath) == 0)
 				//{
 				//		return 0;
 				//}	
@@ -801,25 +1162,21 @@ int mainMenuCycle(char* filepath)
 			break;
 		case '3':
 			//Level Select
-			//if(levelSelectCycle(filepath) == 0)
+			//if(levelSelectCycle(filepath) == 0 
 			//{
 			//		return 0;
 			//}
 			break;
 		case '4':
-			//Leaderboard;
-			displayLeaderboard();
+			//Delete;
+			deleteUser();
+			return 1;
 			break;
 		case '5':
-			//Delete;
-			//removeUser();
-			//return 1;
-			break;
-		case '6':
 			//Log out
 			return 1;
 			break;
-		case '7':
+		case '6':
 			//Exit the game
 			return 2;
 			break;
@@ -830,32 +1187,73 @@ int mainMenuCycle(char* filepath)
 	}
 }
 
+//Returns
+//0 - Everything is OK
+//1 - Something went wrong
+int loginCycle()
+{
+	char ID[51] = "\0";
+	while (true)
+	{
+		system("cls");
+		cout << "Hello user!\n\nPlease enter your ID\n\nIf you don't have a profile, one will be automatically generated\n\nID: ";
+		cin.getline(ID,50);
+		ID[50] = '\0';
+		if (!stringContains(ID, "<>:\"/\\|?*\0"))
+		{
+			if (logInUser(ID) != 0)
+			{
+				return 1;
+			}
+			return 0;
+		}
+		cin.ignore();
+		displayMessage("Invalid ID was entered.\nPlease try again.\nType any key and press Enter to try again\0");
+	}
+}
+
+#pragma endregion
+
 int main()
 {
 	char* file = new char[200];
-	rewriteCharArray(file, "./Files/Maps/test_map.txt\0");
+	//rewriteCharArray(file, "./Files/Maps/test_map.txt\0");
 	//cout << file
 	bool ignore_main_menu = false;
+	bool user_logged_in = false;
 	while (true)
 	{
+		if (!user_logged_in)
+		{
+			if (loginCycle() == 1)
+			{
+				displayMessage("Login Failed");
+				return 0;
+			}
+			user_logged_in = true;
+		}
 		if (!ignore_main_menu)
 		{
 			switch (mainMenuCycle(file))
 			{
-			case 0:
-				break;
-			case 1:
-				//Return to login cycle
-				return 0;
-				break;
-			case 2:
-				return 0;
-				break;
-			default:
-				system("clr");
-				cout << "Something major happened in Main Menu Cycle\0Ending program";
-				waitUserInput();
-				return 0;
+				case 0:
+					break;
+				case 1:
+					user_logged_in = false;
+					logOffUser();
+					cin.ignore();
+					break;
+				case 2:
+					return 0;
+					break;
+				default:
+					system("clr");
+					cout << "Something major happened in Main Menu Cycle\0Ending program";
+					return 0;
+			}
+			if (!user_logged_in)
+			{
+				continue;
 			}
 		}
 		system("cls");
@@ -869,12 +1267,18 @@ int main()
 			//Change the filepath and load the next sub-level
 			break;
 		case 1:
+			//Proceed to next level
 			system("cls");
 			ignore_main_menu = false;
 			break;
 		case 2:
+			//Exit game
 			return 0;
-			//Exit the game
+			break;
+		case 3:
+			//Return to main menu cycle
+			system("cls");
+			ignore_main_menu = true;
 			break;
 		}
 	}
