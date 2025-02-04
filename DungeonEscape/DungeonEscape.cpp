@@ -7,8 +7,10 @@ using namespace std;
 struct User {
 	bool new_user = true;
 	char ID[200] = "Undefined\0";
-	unsigned long long coins = 0;
-	unsigned long long last_unlocked_level = 0;
+	size_t coins = 0;
+	size_t last_unlocked_level = 0;
+	bool save_file_created = false;
+	bool save_file_used = false;
 };
 
 struct Point {
@@ -19,7 +21,7 @@ struct Point {
 struct Player {
 	Point position;
 	int lives = 3;
-	unsigned long long coins = 0;
+	size_t coins = 0;
 	bool key = false;
 };
 
@@ -56,13 +58,19 @@ char main_menu_screen[main_menu_screen_height][main_menu_screen_width] = {
 };
 
 const size_t level_select_screen_width = 30; //For Debugging Purposes
-const size_t level_select_screen_height = 6; //For Debugging Purposes
+const size_t level_select_screen_height = 12; //For Debugging Purposes
 char level_select_screen[level_select_screen_height][level_select_screen_width] = {
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'L', 'e', 'v', 'e', 'l', ' ', 's', 'e', 'l', 'e', 'c', 't', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'A', 'v', 'a', 'i', 'l', 'a', 'b', 'l', 'e', ' ', 'L', 'e', 'v', 'e', 'l', 's', ':', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'I', 'D', ' ', ' ', ' ', 'N', 'a', 'm', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '1', ' ', ' ', ' ', 'T', 'e', 's', 't', ' ', 'l', 'e', 'v', 'e', 'l', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'}
 };
 
@@ -141,6 +149,13 @@ void rewriteCharArray(char* arr, char line[], size_t max_size)
 
 #pragma endregion
 
+void waitUserInput()
+{
+	char temp;
+	cin >> temp;
+	cin.ignore();
+}
+
 void displayMainMenu()
 {
 	cout << main_menu_screen[0] << endl << main_menu_screen[1] << endl;
@@ -171,6 +186,34 @@ void displayPauseMenu() {
 	{
 		cout << pause_screen[i] << endl;
 	}
+}
+
+void displayLeaderboard()
+{
+	system("cls");
+	char filepath[] = "./Files/leaderboard.txt\0";
+	ifstream leaderboard(filepath);
+
+	if (!leaderboard.is_open())
+	{
+		cout << "Error while trying to load leaderboard.";
+		cout << endl << "Enter any input to go back to the Main Menu\n";
+		waitUserInput();
+		return;
+	}
+
+	char line[222];
+	while (!leaderboard.eof())
+	{
+		leaderboard.getline(line, 222);
+		cout << line << endl;
+	}
+	leaderboard.close();
+
+	cout << endl << "Enter any input to go back to the Main Menu\n";
+
+	waitUserInput();
+
 }
 
 void switchMapElements(Point cell1, Point cell2, bool clearCell2)
@@ -717,50 +760,119 @@ int levelCycle(char filepath[])
 }
 
 
-
-void mainMenuCycle(char* filepath)
+//Returns
+//0 - Run Level
+//1 - Log out
+//2 - Exit Game
+int mainMenuCycle(char* filepath)
 {
-
+	char input;
+	const size_t max_message_index = 200;
+	char message[max_message_index] = "\0";
+	while (true)
+	{
+		system("cls");
+		displayMainMenu();
+		cout << "\n" << message;
+		rewriteCharArray(message, "\0");
+		cout << "\n\n\nEnter your input: ";
+		cin >> input;
+		switch (input)
+		{
+		case '1':
+			//New Game
+			user.save_file_used = false;
+			rewriteCharArray(filepath, "./Files/Maps/test_map.txt\0");
+			return 0;
+			break;
+		case '2':
+			//Continue;
+			if (user.save_file_used)
+			{
+				//if(loadSaveFile(filepath) == 0)
+				//{
+				//		return 0;
+				//}	
+				rewriteCharArray(message, "Error: Couldn't currently read save data\0", max_message_index);
+				waitUserInput();
+				break;
+			}
+			rewriteCharArray(message, "No save data associated to this user was found\0", max_message_index);
+			break;
+		case '3':
+			//Level Select
+			//if(levelSelectCycle(filepath) == 0)
+			//{
+			//		return 0;
+			//}
+			break;
+		case '4':
+			//Leaderboard;
+			displayLeaderboard();
+			break;
+		case '5':
+			//Delete;
+			//removeUser();
+			//return 1;
+			break;
+		case '6':
+			//Log out
+			return 1;
+			break;
+		case '7':
+			//Exit the game
+			return 2;
+			break;
+		default:
+			rewriteCharArray(message, "Invalid input. Try again: \0", max_message_index);
+			break;
+		}
+	}
 }
 
 int main()
 {
 	char* file = new char[200];
 	rewriteCharArray(file, "./Files/Maps/test_map.txt\0");
-	//cout << file;
+	//cout << file
 	bool ignore_main_menu = false;
 	while (true)
 	{
-		/*if (!ignore_main_menu)
+		if (!ignore_main_menu)
 		{
 			switch (mainMenuCycle(file))
 			{
-
+			case 0:
+				break;
+			case 1:
+				//Return to login cycle
+				return 0;
+				break;
+			case 2:
+				return 0;
+				break;
+			default:
+				system("clr");
+				cout << "Something major happened in Main Menu Cycle\0Ending program";
+				waitUserInput();
+				return 0;
 			}
-		}*/
+		}
+		system("cls");
 		switch (levelCycle(file))
 		{
 		case 0:
 			system("cls");
 			cout << "Sub level finished";
-			cin;
-			cin.ignore();
+			waitUserInput();
+			ignore_main_menu = true;
 			//Change the filepath and load the next sub-level
-			return 0;
 			break;
 		case 1:
 			system("cls");
-			cout << "Exited to main menu";
-			cin;
-			cin.ignore();
-			return 0;
-			//Load the main menu
+			ignore_main_menu = false;
 			break;
 		case 2:
-			system("cls");
-			cout << "Exited Game";
-			cin;
-			cin.ignore();
 			return 0;
 			//Exit the game
 			break;
