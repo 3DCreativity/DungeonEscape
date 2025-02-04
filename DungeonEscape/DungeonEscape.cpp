@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#include <ctime>
+#include <stdlib.h>
 using namespace std;
 
 #pragma region struct Definitions
@@ -23,6 +25,8 @@ struct Player {
 	int lives = 3;
 	size_t coins = 0;
 	bool key = false;
+	char played_sub_levels[3] = { 0,0,0 };
+	int played_sub_levels_count = 0;
 };
 
 #pragma endregion 
@@ -66,9 +70,9 @@ char level_select_screen[level_select_screen_height][level_select_screen_width] 
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'I', 'D', ' ', ' ', ' ', 'N', 'a', 'm', 'e', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
-			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '1', ' ', ' ', ' ', 'T', 'e', 's', 't', ' ', 'l', 'e', 'v', 'e', 'l', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
-			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
-			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '1', ' ', ' ', ' ', 'L', 'e', 'v', 'e', 'l', ' ', '1', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '2', ' ', ' ', ' ', 'L', 'e', 'v', 'e', 'l', ' ', '2', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
+			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '3', ' ', ' ', ' ', 'L', 'e', 'v', 'e', 'l', ' ', '3', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'}
@@ -90,6 +94,8 @@ size_t portal_data_size;
 
 size_t display_width;
 size_t display_height;
+
+int levelIndex = -1;//Used from save files
 
 Player player;
 
@@ -248,6 +254,109 @@ long long fromString(char* arr)
 	return result;
 }
 
+size_t stringLength(const char* arr)
+{
+	size_t result = 0;
+	while (arr[result] != '\0')
+	{
+		result++;
+	}
+	return result;
+}
+size_t stringLength(char* arr)
+{
+	size_t result = 0;
+	while (arr[result] != '\0')
+	{
+		result++;
+	}
+	return result;
+}
+
+void combineCharArray(const char* one,const char* two, char* result)
+{
+	//result = new char[stringLength(one) + stringLength(two)];
+	size_t index_result = 0;
+	size_t index = 0;
+	while (one[index] != '\0')
+	{
+		result[index_result] = one[index];
+		index_result++;
+		index++;
+	}
+	index = 0;
+	while (two[index] != '\0')
+	{
+		result[index_result] = two[index];
+		index_result++;
+		index++;
+	}
+	result[index_result] = '\0';
+}
+
+void combineCharArray(char* one, const char* two, char* result)
+{
+	//result = new char[stringLength(one) + stringLength(two)];
+	size_t index_result = 0;
+	size_t index = 0;
+	while (one[index] != '\0')
+	{
+		result[index_result] = one[index];
+		index_result++;
+		index++;
+	}
+	index = 0;
+	while (two[index] != '\0')
+	{
+		result[index_result] = two[index];
+		index_result++;
+		index++;
+	}
+	result[index_result] = '\0';
+}
+
+void combineCharArray(const char* one, char* two, char* result)
+{
+	//result = new char[stringLength(one) + stringLength(two)];
+	size_t index_result = 0;
+	size_t index = 0;
+	while (one[index] != '\0')
+	{
+		result[index_result] = one[index];
+		index_result++;
+		index++;
+	}
+	index = 0;
+	while (two[index] != '\0')
+	{
+		result[index_result] = two[index];
+		index_result++;
+		index++;
+	}
+	result[index_result] = '\0';
+}
+
+void combineCharArray(char* one, char* two, char* result)
+{
+	//result = new char[stringLength(one) + stringLength(two)];
+	size_t index_result = 0;
+	size_t index = 0;
+	while (one[index] != '\0')
+	{
+		result[index_result] = one[index];
+		index_result++;
+		index++;
+	}
+	index = 0;
+	while (two[index] != '\0')
+	{
+		result[index_result] = two[index];
+		index_result++;
+		index++;
+	}
+	result[index_result] = '\0';
+}
+
 void waitUserInput()
 {
 	char temp;
@@ -256,6 +365,14 @@ void waitUserInput()
 }
 
 #pragma region Display functions
+
+void displayLevelSelect()
+{
+	for (size_t i = 0; i < level_select_screen_height; i++)
+	{
+		cout << level_select_screen[i] << endl;
+	}
+}
 
 void displayMessage(const char* arr)
 {
@@ -343,37 +460,39 @@ void displayPauseMenu() {
 	}
 }
 
-void displayLeaderboard()
-{
-	system("cls");
-	char filepath[] = "./Files/leaderboard.txt\0";
-	ifstream leaderboard(filepath);
-
-	if (!leaderboard.is_open())
-	{
-		cout << "Error while trying to load leaderboard.\n\n";
-		cout << endl << "Enter any input to go back to the Main Menu\n";
-		waitUserInput();
-		return;
-	}
-
-	char line[222];
-	while (!leaderboard.eof())
-	{
-		leaderboard.getline(line, 222);
-		cout << line << endl;
-	}
-	leaderboard.close();
-
-	cout << endl << "Enter any input to go back to the Main Menu\n";
-
-	waitUserInput();
-
-}
+//void displayLeaderboard()
+//{
+//	system("cls");
+//	char filepath[] = "./Files/leaderboard.txt\0";
+//	ifstream leaderboard(filepath);
+//
+//	if (!leaderboard.is_open())
+//	{
+//		cout << "Error while trying to load leaderboard.\n\n";
+//		cout << endl << "Enter any input to go back to the Main Menu\n";
+//		waitUserInput();
+//		return;
+//	}
+//
+//	char line[222];
+//	while (!leaderboard.eof())
+//	{
+//		leaderboard.getline(line, 222);
+//		cout << line << endl;
+//	}
+//	leaderboard.close();
+//
+//	cout << endl << "Enter any input to go back to the Main Menu\n";
+//
+//	waitUserInput();
+//
+//}
 
 #pragma endregion
 
 #pragma region User functions
+
+
 
 void deleteUser()
 {
@@ -422,7 +541,6 @@ void deleteUser()
 
 void logOffUser()
 {
-	user.ID[0] = '\0';
 	user.coins = 0;
 	user.last_unlocked_level = 0;
 	user.new_user = true;
@@ -435,7 +553,7 @@ void logOffUser()
 //1 - something went wrong
 int appendUser(char* ID,size_t current_row_count)
 {
-
+	//Get the rows from file
 	ifstream reader("./Files/users.txt");
 	char** lines = new char*[current_row_count];
 	size_t index = 0;
@@ -446,6 +564,8 @@ int appendUser(char* ID,size_t current_row_count)
 		index++;
 	}
 	reader.close();
+
+	//Erase and rewrite it
 	index = 0;
 	fstream users;
 	users.open("./Files/users.txt", ios::out);
@@ -457,9 +577,10 @@ int appendUser(char* ID,size_t current_row_count)
 	{
 		users << (index == 0 ? "" : "\n") << lines[index];
 	}
-	users << endl << ID << endl << '0' << endl << '0' << endl << "false" << endl << "false";
+
+	//Add the additional user data
+	users << endl << ID << endl << user.coins << endl << user.last_unlocked_level << endl << (user.save_file_created ? "true" : "false") << endl << (user.save_file_used ? "true" : "false");
 	users.close();
-	logOffUser();
 	index = 0;
 	while (ID[index] != '\0')
 	{
@@ -491,6 +612,7 @@ int logInUser(char* ID)
 		row_count++;
 		if (stringEquals(line, ID))
 		{
+			//Copy the data
 			users.getline(line, line_size);
 			user.coins = fromString(line);
 			users.getline(line, line_size);
@@ -514,15 +636,74 @@ int logInUser(char* ID)
 	users.close();
 	if (!user_found)
 	{
+		user.coins = 0;
+		user.last_unlocked_level = 0;
+		user.save_file_created = false;
+		user.save_file_used = false;
 		if (appendUser(ID, row_count) != 0)
 		{
 			return 1;
 		}
+		logOffUser();
 	}
 	return 0;
 }
 
+void saveUserData()
+{
+	deleteUser();
+	ifstream reader("./Files/users.txt");
+	size_t current_row_count = 0;
+	while (!reader.eof())
+	{
+		reader.ignore(51, '\n');
+		current_row_count++;
+	}
+	reader.close();
+	appendUser(user.ID, current_row_count);
+}
+
 #pragma endregion
+
+
+int saveProgress(char* level_name)
+{
+	char* filepath = new char[stringLength("./Files/Saves/\0") + stringLength(user.ID) + stringLength("_map.txt\0")];
+	char* temporaryFilepath = new char[stringLength("./Files/Saves/\0") + stringLength(user.ID)];
+	combineCharArray("./Files/Saves/\0", user.ID, temporaryFilepath);
+	combineCharArray(temporaryFilepath, "_map.txt\0", filepath);
+	fstream mapData;
+	mapData.open(filepath, ios::out);
+	if (!mapData)
+	{
+		return 1;
+	}
+	mapData << map_width << "x" << map_height;
+	for (size_t i = 0; i < map_height; i++)
+	{
+		mapData << endl << map[i];
+	}
+	mapData << endl << portal_data_size << endl;
+	for (size_t i = 0; i < portal_data_size; i += 2)
+	{ 
+		mapData << portal_data[i].x << "x" << portal_data[i].y;
+		mapData << "|" << portal_data[i + 1].x << "x" << portal_data[i + 1].y << endl;
+	}
+	mapData.close();
+	combineCharArray(temporaryFilepath, "_data.txt\0", filepath);
+	fstream playerData;
+	playerData.open(filepath, ios::out);
+	if (!playerData)
+	{
+		return 1;
+	}
+	playerData << player.coins << endl << player.lives << endl << (player.key ? "true" : "false") << endl << level_name[6] << endl << level_name[10];
+	playerData.close();
+	user.save_file_created = true;
+	user.save_file_used = true;
+	saveUserData();
+	return 0;
+}
 
 void switchMapElements(Point cell1, Point cell2, bool clearCell2)
 {
@@ -905,15 +1086,87 @@ void extractLevelName(char* name, char* path, size_t max_name_size)
 	name[index_name] = '\0';
 }
 
+int continueGame(char* filepath)
+{
+	char* temporaryFilepath1 = new char[stringLength("./Files/Saves/\0") + stringLength(user.ID)];
+	combineCharArray("./Files/Saves/\0", user.ID, temporaryFilepath1);
+	combineCharArray(temporaryFilepath1, "_map.txt\0", filepath);
+	char* temporaryFilepath2 = new char[stringLength(temporaryFilepath1) + stringLength("_data.txt\0") + stringLength(user.ID)];
+	combineCharArray("./Files/Saves/\0", user.ID, temporaryFilepath1);
+	combineCharArray(temporaryFilepath1, "_data.txt\0", temporaryFilepath2);
+	ifstream playerData(temporaryFilepath2);
+	if (!playerData.is_open())
+	{
+		return 1;//Something went wrong
+	}
+	size_t line_size = 51;
+	char line[51];
+	bool user_found = false;
+	size_t row_count = 0;
+	playerData.getline(line, line_size);
+	player.coins = fromString(line);
+	playerData.getline(line, line_size);
+	player.lives = fromString(line);
+	playerData.getline(line, line_size);
+	player.key = stringEquals(line, "true");
+	playerData.getline(line, line_size);
+	levelIndex = fromString(line);
+	playerData.close();
+	return 0;
+}
+
+int loadNextSublevel(char* filepath)
+{
+	if (levelIndex != -1)
+	{
+		char levelIndexStr = ('0' + levelIndex);
+		rewriteCharArray(filepath, "./Files/Maps/0/Level 0 - 0.txt\0");
+		filepath[13] = levelIndexStr;
+		filepath[21] = levelIndexStr;
+	}
+
+	if (player.played_sub_levels_count == 3)
+	{
+		player.played_sub_levels[0] = 0;
+		player.played_sub_levels[1] = 0;
+		player.played_sub_levels[2] = 0;
+		player.played_sub_levels_count = 0;
+		return 1;
+	}
+	int randomNumber;
+	int counter = 0;
+	bool repeated = false;
+	while (true)
+	{
+		repeated = false;
+		randomNumber = (rand() % 3) + 1; 
+		
+		for (; counter < player.played_sub_levels_count; counter++)
+		{
+			if (player.played_sub_levels[counter] == randomNumber)
+			{
+				repeated = true;
+				break;
+			}
+		}
+		if (!repeated)
+		{
+			filepath[25] = randomNumber + '0';
+			player.played_sub_levels_count++;
+			break;
+		}
+	}
+	return 0;
+}
+
 #pragma region Menus, and cycles - pauseMenu, step, levelCycle, mainMenuCycle, loginCycle
 
 //Returns
 //0 - Resume
 //1 - Exit to Main Menu
 //2 - Exit Game
-int pauseMenu()
+int pauseMenu(char* level_name)
 {
-	char pause_input;
 	const size_t max_message_index = 200;
 	char pause_message[max_message_index] = "\0";
 	char input;
@@ -931,8 +1184,15 @@ int pauseMenu()
 			return_status = 0;
 			break;
 		case '2':
-			//Run save function - saveProgress(pause_message);
-			rewriteCharArray(pause_message, "Save functionality is still under construction\0", max_message_index);
+			/*if (saveProgress(level_name) == 0)
+			{
+				rewriteCharArray(pause_message, "Progress saved\0", max_message_index);
+			}
+			else
+			{
+				rewriteCharArray(pause_message, "Progress couldn't be saved\0", max_message_index);
+			}*/
+			rewriteCharArray(pause_message, "Feature is under development\0", max_message_index);
 			break;
 		case '3':
 			if (displayPrompt("Warning!\nExiting to the Main Menu may cause your progress to be lost!\nMake sure you have saved your progress before continuing.\n\n[1] To Main Menu\t\t[2] Go back\n\0") == 1) {
@@ -963,7 +1223,7 @@ int pauseMenu()
 //3 - Main Menu
 //4 - End Game
 //5 - Exit Game
-int step(char input)
+int step(char input,char*level_name)
 {
 	switch (input)
 	{
@@ -997,7 +1257,7 @@ int step(char input)
 		break;
 	case 'p':
 	case 'P':
-		switch (pauseMenu())
+		switch (pauseMenu(level_name))
 		{
 		case 0:
 			//Do nothing
@@ -1033,8 +1293,7 @@ int levelCycle(char filepath[])
 	//Try to read map
 	if (readMapData(filepath) == 1)
 	{
-		//TODO: Change to a screen message
-		cout << "Something went wrong while trying to open the Map Data file";
+		displayMessage("Something went wrong");
 		return 1;
 	}
 
@@ -1056,7 +1315,7 @@ int levelCycle(char filepath[])
 		cout << "\n" << message;
 		cout << "\n\n\nEnter your input: ";
 		cin >> input;
-		switch (step(input))
+		switch (step(input,level_name))
 		{
 			case 1:
 				cout << "Something major has gone wrong";
@@ -1120,6 +1379,46 @@ int levelCycle(char filepath[])
 	}
 }
 
+void startNewGame(char* filepath)
+{
+	user.save_file_used = false;
+	char sub_level_index = ((int)((rand() % 3) + 1)) + '0';
+	rewriteCharArray(filepath, "./Files/Maps/1/Level 1 - 0.txt\0");
+	filepath[25] = sub_level_index;
+	player.played_sub_levels_count++;
+	player.played_sub_levels[0] = sub_level_index - '0';
+}
+
+int levelSelectCycle(char* filepath)
+{
+	char input;
+	const size_t max_message_index = 200;
+	char message[max_message_index] = "\0";
+	while (true)
+	{
+		system("cls");
+		displayLevelSelect();
+		cout << endl << message << endl << endl << "Enter input: ";
+		cin >> input;
+		switch (input)
+		{
+		case '1':
+			rewriteCharArray(filepath, "./Files/Maps/1/Level 1 - 0.txt\0");
+			return 0;
+		case '2':
+			rewriteCharArray(filepath, "./Files/Maps/2/Level 2 - 0.txt\0");
+			return 0;
+		case '3':
+			rewriteCharArray(filepath, "./Files/Maps/3/Level 3 - 0.txt\0");
+			return 0;
+		default:
+			rewriteCharArray(message, "Invalid input. Try again: \0", max_message_index);
+			break;
+		}
+	}
+	
+
+}
 
 //Returns
 //0 - Run Level
@@ -1142,34 +1441,38 @@ int mainMenuCycle(char* filepath)
 		{
 		case '1':
 			//New Game
-			user.save_file_used = false;
-			rewriteCharArray(filepath, "./Files/Maps/test_map.txt\0");
+			startNewGame(filepath);
 			return 0;
 			break;
 		case '2':
 			//Continue;
-			if (user.save_file_used)
+			/*if (user.save_file_used)
 			{
-				//if(setSaveFile(filepath) == 0)
-				//{
-				//		return 0;
-				//}	
+				if(continueGame(filepath) == 0)
+				{
+						return 0;
+				}	
 				rewriteCharArray(message, "Error: Couldn't currently read save data\0", max_message_index);
 				waitUserInput();
 				break;
-			}
-			rewriteCharArray(message, "No save data associated to this user was found\0", max_message_index);
+			}*/
+			rewriteCharArray(message, "This feature is under development\0", max_message_index);
 			break;
 		case '3':
 			//Level Select
-			//if(levelSelectCycle(filepath) == 0 
-			//{
-			//		return 0;
-			//}
+			if(levelSelectCycle(filepath) == 0)
+			{
+				if (loadNextSublevel(filepath) == 0) {
+					return 0;
+				}
+				displayMessage("Sub level couldn't be loaded. \nEnter anything to exit the program.\0");
+				return 2;
+			}
 			break;
 		case '4':
 			//Delete;
 			deleteUser();
+			logOffUser();
 			return 1;
 			break;
 		case '5':
@@ -1212,13 +1515,84 @@ int loginCycle()
 	}
 }
 
+
+int mainMenuSwitch(char* filepath, bool& user_logged_in)
+{
+	switch (mainMenuCycle(filepath))
+	{
+	case 0:
+		break;
+	case 1:
+		user_logged_in = false;
+		logOffUser();
+		cin.ignore();
+		break;
+	case 2:
+		return 0;
+		break;
+	default:
+		system("clr");
+		cout << "Something major happened in Main Menu Cycle\0Ending program";
+		return 0;
+	}
+	return 1;
+}
+
+int levelSwitch(char* filepath, bool& ignore_main_menu)
+{
+	switch (levelCycle(filepath))
+	{
+	case 0:
+		system("cls");
+		cout << "Sub level finished";
+		waitUserInput();
+		ignore_main_menu = true;
+		switch (loadNextSublevel(filepath))
+		{
+		case 0:
+			//Load the level
+			return 1;
+			break;
+		case 1:
+			//The level was completed
+			displayMessage("Congratulations! You have cleared the level!");
+			levelIndex = -1;
+			user.last_unlocked_level++;
+			//saveUserData();
+			ignore_main_menu = false;
+			return 1;
+		default:
+			displayMessage("Sub level couldn't be loaded.\n Enter anything to stop the program\0");
+			return 0;
+			break;
+		}
+		break;
+	case 1:
+		//Proceed to next level
+		system("cls");
+		ignore_main_menu = false;
+		break;
+	case 2:
+		//Exit game
+		return 0;
+		break;
+	case 3:
+		//Return to main menu cycle
+		system("cls");
+		ignore_main_menu = true;
+		break;
+	}
+	return 1;
+}
+
 #pragma endregion
+
+
 
 int main()
 {
+	srand(time(0));
 	char* file = new char[200];
-	//rewriteCharArray(file, "./Files/Maps/test_map.txt\0");
-	//cout << file
 	bool ignore_main_menu = false;
 	bool user_logged_in = false;
 	while (true)
@@ -1234,22 +1608,8 @@ int main()
 		}
 		if (!ignore_main_menu)
 		{
-			switch (mainMenuCycle(file))
-			{
-				case 0:
-					break;
-				case 1:
-					user_logged_in = false;
-					logOffUser();
-					cin.ignore();
-					break;
-				case 2:
-					return 0;
-					break;
-				default:
-					system("clr");
-					cout << "Something major happened in Main Menu Cycle\0Ending program";
-					return 0;
+			if (mainMenuSwitch(file, user_logged_in) == 0) {
+				return 0;
 			}
 			if (!user_logged_in)
 			{
@@ -1257,29 +1617,8 @@ int main()
 			}
 		}
 		system("cls");
-		switch (levelCycle(file))
-		{
-		case 0:
-			system("cls");
-			cout << "Sub level finished";
-			waitUserInput();
-			ignore_main_menu = true;
-			//Change the filepath and load the next sub-level
-			break;
-		case 1:
-			//Proceed to next level
-			system("cls");
-			ignore_main_menu = false;
-			break;
-		case 2:
-			//Exit game
+		if (levelSwitch(file, ignore_main_menu) == 0) {
 			return 0;
-			break;
-		case 3:
-			//Return to main menu cycle
-			system("cls");
-			ignore_main_menu = true;
-			break;
 		}
 	}
 	return 0;
